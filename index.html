@@ -5,53 +5,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Strike is always dark now -- a deliberate "trading terminal" identity
+     rather than a page that happens to support dark mode. One palette,
+     no light variant, no system-preference switch. */
   :root {
-    color-scheme: light;
-    --page:        #f5f6fa;
-    --surface:     #ffffff;
-    --surface-2:   #eef0f6;
-    --ink:         #12121a;
-    --ink-2:       #4a4d5c;
-    --ink-muted:   #8a8da0;
-    --grid:        #e5e7f0;
-    --baseline:    #c9cbdb;
-    --border:      rgba(18,18,26,0.09);
-    --border-2:    rgba(18,18,26,0.15);
-    --accent:      #5b52f0;   /* market price / primary UI accent */
-    --accent-ink:  #ffffff;
-    --model:       #e8901f;   /* model price */
-    --iv-hue:      #0e9f8e;   /* implied-vol panel */
-    --good:        #12a350;
-    --warning:     #d97706;
-    --serious:     #e2653a;
-    --critical:    #e0353f;
-    --s1: #5b52f0; --s2: #e8901f; --s3: #0e9f8e; --s4: #c026d3;
-    --s5: #e0499b; --s6: #2e8b3d; --s7: #3454d1; --s8: #e0353f;
-    --shadow: 0 1px 2px rgba(18,18,26,0.04), 0 8px 28px -14px rgba(18,18,26,0.16);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --page:        #08090d;
-      --surface:     #131520;
-      --surface-2:   #1b1e2b;
-      --ink:         #f3f4f8;
-      --ink-2:       #a4a7ba;
-      --ink-muted:   #656982;
-      --grid:        #22242f;
-      --baseline:    #34374a;
-      --border:      rgba(255,255,255,0.08);
-      --border-2:    rgba(255,255,255,0.14);
-      --accent:      #8b83ff;
-      --accent-ink:  #0a0912;
-      --model:       #f0a83f;
-      --iv-hue:      #2dd4c2;
-      --s1: #8b83ff; --s2: #f0a83f; --s3: #2dd4c2; --s4: #e879f9;
-      --s5: #f472b6; --s6: #4ade80; --s7: #7c9aff; --s8: #fb7185;
-      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 28px -14px rgba(0,0,0,0.6);
-    }
-  }
-  :root[data-theme="dark"] {
     color-scheme: dark;
     --page:        #08090d;
     --surface:     #131520;
@@ -63,13 +20,18 @@
     --baseline:    #34374a;
     --border:      rgba(255,255,255,0.08);
     --border-2:    rgba(255,255,255,0.14);
-    --accent:      #8b83ff;
+    --accent:      #8b83ff;   /* market price / primary UI accent */
     --accent-ink:  #0a0912;
-    --model:       #f0a83f;
-    --iv-hue:      #2dd4c2;
+    --model:       #f0a83f;   /* model price */
+    --iv-hue:      #2dd4c2;   /* implied-vol panel */
+    --good:        #33d17a;
+    --warning:     #f0a83f;
+    --serious:     #f2895c;
+    --critical:    #fb7185;
     --s1: #8b83ff; --s2: #f0a83f; --s3: #2dd4c2; --s4: #e879f9;
     --s5: #f472b6; --s6: #4ade80; --s7: #7c9aff; --s8: #fb7185;
     --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 28px -14px rgba(0,0,0,0.6);
+    --glow: 0 0 0 1px rgba(139,131,255,0.5), 0 0 28px -6px rgba(139,131,255,0.55);
   }
 
   * { box-sizing: border-box; }
@@ -79,7 +41,14 @@
     color: var(--ink);
     font-family: 'Space Grotesk', system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  body { -webkit-font-smoothing: antialiased; }
+  body {
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(900px 480px at 12% -8%, rgba(139,131,255,0.14), transparent 60%),
+      radial-gradient(700px 420px at 100% 0%, rgba(45,212,194,0.09), transparent 55%),
+      var(--page);
+    background-attachment: fixed;
+  }
   a { color: var(--accent); }
   ::selection { background: var(--accent); color: var(--accent-ink); }
 
@@ -104,7 +73,7 @@
     flex-wrap: wrap;
   }
   .brand { display: flex; align-items: center; gap: 9px; }
-  .brand-mark { display: flex; line-height: 0; }
+  .brand-mark { display: flex; line-height: 0; filter: drop-shadow(0 0 10px rgba(139,131,255,0.5)); }
   .brand-name {
     font-weight: 700;
     font-size: 19px;
@@ -162,6 +131,7 @@
     border-bottom: 1px solid transparent;
   }
   .engine-highlights-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .engine-highlights-link.predictive-link:hover { color: var(--iv-hue); border-bottom-color: var(--iv-hue); }
   .run-meta {
     display: flex;
     gap: 22px;
@@ -174,8 +144,8 @@
     color: var(--ink-muted); font-weight: 500;
   }
   .run-meta dd {
-    margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 19px;
-    font-weight: 500; color: var(--ink);
+    margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 21px;
+    font-weight: 600; color: var(--ink);
   }
 
   /* ---------- persona switcher ---------- */
@@ -187,9 +157,10 @@
     font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 500;
     padding: 8px 15px; border-radius: 7px; border: 1px solid transparent;
     background: transparent; color: var(--ink-2); cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   }
   .persona-tab:hover { color: var(--ink); }
-  .persona-tab.is-active { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow); }
+  .persona-tab.is-active { background: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); }
   .persona-blurb { margin: 2px 0 0; font-size: 13px; color: var(--ink-muted); max-width: 70ch; }
 
   /* ---------- stat tiles ---------- */
@@ -212,7 +183,7 @@
   .tile-label { font-size: 12.5px; color: var(--ink-2); }
   .tile-value {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 26px; font-weight: 500; letter-spacing: -0.01em;
+    font-size: 30px; font-weight: 600; letter-spacing: -0.01em;
   }
   .tile-note { font-size: 12px; color: var(--ink-muted); }
 
@@ -289,10 +260,8 @@
   }
   .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
   .pill-good { color: var(--good); } .pill-good .pill-dot { background: var(--good); }
-  .pill-warn { color: #a06400; } .pill-warn .pill-dot { background: var(--warning); }
+  .pill-warn { color: var(--warning); } .pill-warn .pill-dot { background: var(--warning); }
   .pill-bad  { color: var(--critical); } .pill-bad .pill-dot { background: var(--critical); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill-warn { color: var(--warning); } }
-  :root[data-theme="dark"] .pill-warn { color: var(--warning); }
 
   /* ---------- horizontal bars ---------- */
   .hbars { display: flex; flex-direction: column; gap: 3px; }
@@ -330,7 +299,9 @@
   }
   .fact { display: flex; flex-direction: column; gap: 3px; }
   .fact dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); }
-  .fact dd { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; }
+  .fact dd { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }
+  .fact dd .pl-pos { text-shadow: 0 0 16px rgba(51,209,122,0.35); }
+  .fact dd .pl-neg { text-shadow: 0 0 16px rgba(251,113,133,0.35); }
 
   .thesis-grid {
     display: grid;
@@ -427,7 +398,6 @@
   }
   .src-tag.fallback { color: var(--warning); border-color: var(--warning); }
   .src-tag.smile { color: var(--iv-hue); border-color: var(--iv-hue); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .src-tag.fallback { color: var(--warning); } }
 
   .reco-tag {
     font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600;
@@ -511,13 +481,35 @@
   /* ---------- inline term help (glossary tooltips on jargon headers) ---------- */
   .th-help { border-bottom: 1px dotted var(--ink-muted); cursor: help; }
 
-  /* ---------- tile hover + semantic top-border color ---------- */
-  .tile { transition: box-shadow 0.15s ease, transform 0.15s ease; }
-  .tile:hover { box-shadow: 0 2px 4px rgba(18,18,26,0.06), 0 14px 32px -16px rgba(18,18,26,0.22); transform: translateY(-1px); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tile:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 14px 32px -16px rgba(0,0,0,0.7); } }
-  :root[data-theme="dark"] .tile:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 14px 32px -16px rgba(0,0,0,0.7); }
-  .tile.tile-model { border-top-color: var(--model); }
-  .tile.tile-iv { border-top-color: var(--iv-hue); }
+  /* ---------- tile hover + semantic top-border color + glow ---------- */
+  .tile { transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease; }
+  .tile:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 16px 36px -16px rgba(0,0,0,0.75), 0 0 32px -12px var(--tile-glow, rgba(139,131,255,0.55));
+    transform: translateY(-2px);
+  }
+  .tile.tile-model { border-top-color: var(--model); --tile-glow: rgba(240,168,63,0.5); }
+  .tile.tile-iv { border-top-color: var(--iv-hue); --tile-glow: rgba(45,212,194,0.5); }
+  .tile-value { text-shadow: 0 0 22px rgba(139,131,255,0.25); }
+  .tile.tile-model .tile-value { text-shadow: 0 0 22px rgba(240,168,63,0.22); }
+  .tile.tile-iv .tile-value { text-shadow: 0 0 22px rgba(45,212,194,0.22); }
+  @keyframes tilePulse {
+    0% { opacity: 0.3; transform: translateY(2px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .tile-value.is-pulsing { animation: tilePulse 0.35s ease; }
+
+  /* ---------- gentle load-in motion (once, on first paint) ---------- */
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .tiles .tile, .panel, .grid-2 .panel {
+    animation: riseIn 0.5s ease both;
+  }
+  .tiles .tile:nth-child(1) { animation-delay: 0.02s; }
+  .tiles .tile:nth-child(2) { animation-delay: 0.07s; }
+  .tiles .tile:nth-child(3) { animation-delay: 0.12s; }
+  .tiles .tile:nth-child(4) { animation-delay: 0.17s; }
 
   /* ---------- small-screen refinements ---------- */
   @media (max-width: 480px) {
@@ -556,7 +548,7 @@
         <span class="reco-tag" title="Discounted using a real short-end Treasury curve (13-week, 5-year, 10-year yields, linearly interpolated) -- not a single flat rate.">Live Treasury rate curve</span>
         <span class="reco-tag" title="Dividends priced as real discrete cash payments on projected ex-dividend dates, sourced from each stock's own payment history.">Real dividend schedule</span>
         <a href="#methodology" class="engine-highlights-link">Full methodology &darr;</a>
-        <a href="predictive.html" class="engine-highlights-link">Predictive signal backtest &rarr;</a>
+        <a href="predictive.html" class="engine-highlights-link predictive-link">Predictive signal backtest &rarr;</a>
       </p>
       <details class="explainer">
         <summary>New here? What this page actually shows</summary>
@@ -885,9 +877,20 @@
   function hideTooltip() { tooltipEl.classList.remove("visible"); }
 
   /* ---------------- stat tiles ---------------- */
+  // Brief pulse animation whenever a tile's number actually changes (e.g.
+  // switching personas) -- purely cosmetic, skipped entirely under
+  // prefers-reduced-motion via the global transition/animation kill switch.
+  function setTileValue(id, html) {
+    var el = document.getElementById(id);
+    if (el.innerHTML === html) return;
+    el.innerHTML = html;
+    el.classList.remove("is-pulsing");
+    void el.offsetWidth; // force reflow so the animation can retrigger
+    el.classList.add("is-pulsing");
+  }
   function renderTiles() {
-    document.getElementById("tileStocks").textContent = STOCKS.length.toLocaleString("en-US");
-    document.getElementById("tileContracts").textContent = CONTRACTS.length.toLocaleString("en-US");
+    setTileValue("tileStocks", STOCKS.length.toLocaleString("en-US"));
+    setTileValue("tileContracts", CONTRACTS.length.toLocaleString("en-US"));
     document.getElementById("metaStocks").textContent = STOCKS.length.toLocaleString("en-US");
     document.getElementById("metaContracts").textContent = CONTRACTS.length.toLocaleString("en-US");
 
@@ -896,8 +899,8 @@
     var avgGap = diffs.length ? diffs.reduce(function (a, b) { return a + b; }, 0) / diffs.length : null;
     var avgIv = ivs.length ? ivs.reduce(function (a, b) { return a + b; }, 0) / ivs.length : null;
 
-    document.getElementById("tileGap").innerHTML = fmtMoney(avgGap);
-    document.getElementById("tileIv").innerHTML = fmtPct(avgIv);
+    setTileValue("tileGap", fmtMoney(avgGap));
+    setTileValue("tileIv", fmtPct(avgIv));
   }
 
   /* ---------------- paper trading (Alpaca) ---------------- */
